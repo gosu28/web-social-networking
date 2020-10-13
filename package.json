@@ -1,64 +1,37 @@
 {
-  "name": "ai_callcenter_cms_backend",
+  "name": "web-social-networking",
   "version": "1.0.0",
-  "description": "",
+  "description": "- Routes: Khai báo các route API và các middleware\r - Middlewares: Chứa các hàm trung gian để kiểm tra điều kiện hoặc các sự kiện chung trước khi đi vào controller\r - Controllers: Mục đích kiểm tra tính hợp lệ của dữ liệu đầu vào. Sau đó điều hướng đến các service để thực thi nghiệp vụ\r - Services: Thực thi các nghiệp vụ của project\r - Models: Chứa các models\r - Utils: Chứa các hàm xử lý chung cho cả project\r - Erros: Xử lý các lỗi do hệ thống phát sinh và trả về mã code cho frontend\r - Scripts: Chạy những scirpt liên quan đến hệ điều hành\r - Test: Chứa các file unit test\r - Environments: Chứa các file lưu các thông số của project tùy theo mỗi môi trường",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node index.js",
-    "dev": "cross-env NODE_ENV=dev nodemon index.js",
-    "deploy:first": "cross-env NODE_ENV=production pm2-runtime start index.js --name ai_callcenter_cms_backend",
-    "deploy": "cross-env NODE_ENV=production pm2 start index.js --name ai_callcenter_cms_backend",
-    "log": "cross-env NODE_ENV=production pm2 logs 0",
-    "lint": "eslint . --ext .js -f ./.eslintformatter.js; exit 0",
-    "lint:fix": "eslint . --ext .js -f ./.eslintformatter.js --fix; exit 0",
-    "lint:staged": "lint-staged",
-    "prettify": "prettier --write"
+    "start": "node server",
+    "server": "nodemon server"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit-msg": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "**/*.js": [
-      "npm run lint:fix",
-      "git add"
-    ]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gosu28/web-social-networking.git"
   },
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gosu28/web-social-networking/issues"
+  },
+  "homepage": "https://github.com/gosu28/web-social-networking#readme",
   "dependencies": {
-    "axios": "0.18.0",
-    "bluebird": "3.5.5",
-    "body-parser": "1.19.0",
-    "camelcase-keys": "5.2.0",
-    "compression": "1.7.4",
-    "cors": "2.8.5",
-    "cross-env": "5.2.0",
-    "dotenv": "8.0.0",
-    "express": "4.17.0",
-    "express-mung": "0.5.1",
-    "express-status-monitor": "1.2.5",
-    "express-validator": "5.3.1",
-    "helmet": "3.18.0",
-    "log4js": "^4.3.1",
-    "modesl": "^1.2.1",
-    "mongoose": "5.5.11",
-    "mongoose-long": "0.2.1",
-    "morgan": "1.9.1",
-    "multer": "1.4.1",
-    "snakecase-keys": "2.1.0",
-    "urlencode": "^1.1.0"
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "config": "^3.3.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.6.1",
+    "gravatar": "^1.8.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.9",
+    "morgan": "^1.10.0",
+    "request": "^2.88.2"
   },
   "devDependencies": {
-    "chalk": "2.4.2",
-    "eslint": "5.16.0",
-    "eslint-config-airbnb-base": "13.1.0",
-    "eslint-config-prettier": "4.3.0",
-    "eslint-plugin-import": "2.17.3",
-    "eslint-plugin-prettier": "3.1.0",
-    "husky": "2.3.0",
-    "lint-staged": "8.1.7",
-    "prettier": "1.17.1"
+    "concurrently": "^5.3.0",
+    "nodemon": "^2.0.4"
   }
 }
