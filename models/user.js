@@ -31,6 +31,7 @@ const UserSchema=new mongoose.Schema({
         },
         
     },
+    updated:Date,
     photo:String,
     passwordResetToken: String,
     passwordResetExpires:Date

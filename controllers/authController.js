@@ -84,6 +84,9 @@ exports.protect = async (req, res, next) => {
         req.user = freshUser;
         next();
     } catch (error) {
-        
+        res.status(400).json({
+            status: 'fail',
+            message:error
+        })
     }
 }

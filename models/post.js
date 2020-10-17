@@ -1,4 +1,5 @@
-const mongoose=require('mongoose');
+const mongoose = require('mongoose');
+const {ObjectId}=mongoose.Schema.Types
 const postSchema=new mongoose.Schema({
     title:{
         type:String,
@@ -11,6 +12,17 @@ const postSchema=new mongoose.Schema({
         required:'Body is required',
         minlength:4,
         maxlength:2000
+    },
+    photo: {
+        data: Buffer,
+    },
+    postedBy: {
+        type: ObjectId,
+        ref:"user"
+    },
+    created: {
+        type: Date,
+        default:Date.now
     }
 });
 const post=mongoose.model("Post",postSchema);
