@@ -61,7 +61,8 @@ exports.postByUser = async (req, res) => {
     try {
         const post = await Post.find({
             postedBy: req.user._id
-        }).populate('postedBy', '_id name')
+        })
+        .populate('postedBy', '_id name')
         .sort('_created');
         res.status(200).json({
             status: 'success',
