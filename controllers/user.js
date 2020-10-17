@@ -1,5 +1,12 @@
 const User = require("../models/user");
 
+const filterObj = (obj, ...allowedFields) => {
+    const newObj = {}
+    Object.keys(obj).forEach(el => {
+        if(allowedFields.includes(el)) newObj[el]=obj[el]
+    })
+    return newObj;
+}
 exports.userById = async (req, res, next, id) => {
     try {
         const user = await User.findById(id);
@@ -42,10 +49,8 @@ exports.getUser = (req, res) => {
 }
 exports.updateUser = async (req, res) => {
     try {
-        let user = req.user
-        user = Object.assign(user, req.body);
-        user.updated = Date.now();
-        const updateUser = await User.findByIdAndUpdate(req.user._id, user, {
+        const filteredBody = filterObj(req.body, 'name', 'email');
+        const updateUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
             new: true,
             runValidators: true
         });
