@@ -2,7 +2,9 @@ const Post = require("../models/post");
 const multer = require('multer');
 const sharp = require('sharp');
 const AppError = require('../errors/appError');
-
+const _ = require('lodash');
+const fs = require('fs');
+const path=require('path')
 const multerStorage = multer.memoryStorage();
 const multerFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image')) {
@@ -25,6 +27,7 @@ exports.postById =async (req, res, next, id) => {
             .select('_id title content created likes comments');
         
         req.post = post;
+        
         next();
     } catch (error) {
         res.status(400).json({
@@ -33,16 +36,7 @@ exports.postById =async (req, res, next, id) => {
         })
     }
 }
-exports.isPoster = (req, res, next) => {
-    let isPoster = req.post && req.user && req.post._id == req.user._id;
-    if (!isPoster) {
-        res.status(403).json({
-            status: 'fail',
-            message:'User is not authorized'
-        })
-    }
-    next();
-}
+
 
 exports.resizePostPhoto = async (req, res, next) => {
     try {
@@ -124,17 +118,66 @@ exports.createPost =async (req, res) => {
 
 exports.deletePost = async (req, res) => {
     try {
-        let post = req.post;
-        await post.remove()
-        res.status(204).json({
+        let isPoster = req.post && req.user && req.post.postedBy._id == req.user._id;
+        if (!isPoster)
+        {
+            return res.status(403).json({
+                err: ' User is not authorized'
+              });
+           
+        }
+        await Post.findByIdAndDelete(req.post._id);
+        res.status(201).json({
             status: 'success',
             data:null
         })
     } catch (error) {
-        res.status(404).json({
+        res.status(400).json({
             status: 'fail',
-            message:err
-        })        
+            message:error
+        })       
     }
-    
+}
+exports.updatePost = async (req, res) => {
+    try {
+        // let isPoster = req.post && req.user && req.post.postedBy._id == req.user._id;
+        // if (!isPoster)
+        // {
+        //     return res.status(403).json({
+        //         err: ' User is not authorized'
+        //       });
+           
+        // }
+        let updatePost = req.post;
+       
+        updatePost = _.extend(updatePost, req.body)
+        
+        if (req.file) updatePost.photo = req.file.filename;
+        updatePost.updated = Date.now();
+        // fs.stat(path.join(__dirname), function (err, stats) {
+        //     console.log(stats);//here we got all information of file in stats variable
+        //     if (err) {     
+        //         return console.error(err);     
+        //     }   
+        //     fs.unlink(`../public/image/posts/${req.post.photo}`,function(err){      
+        //          if(err) return console.log(err);    
+        //          console.log('file deleted successfully'); 
+        //     });  
+        //  });
+        
+        console.log(__dirname)
+        
+        const post = await updatePost.save();
+        res.status(200).json({
+        status: 'success',
+        data: {
+          post
+        }
+        });
+    } catch (error) {
+        res.status(400).json({
+            status: 'fail',
+            message:error
+        })       
+    } 
 }
