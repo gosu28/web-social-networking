@@ -121,3 +121,20 @@ exports.createPost =async (req, res) => {
     }
     
 }
+
+exports.deletePost = async (req, res) => {
+    try {
+        let post = req.post;
+        await post.remove()
+        res.status(204).json({
+            status: 'success',
+            data:null
+        })
+    } catch (error) {
+        res.status(404).json({
+            status: 'fail',
+            message:err
+        })        
+    }
+    
+}
