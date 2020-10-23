@@ -5,13 +5,13 @@ const cookieParser=require('cookie-parser')
 const usersRoutes = require('./routes/api/users');
 const postRouters = require('./routes/api/posts');
 const authRouters = require('./routes/api/auth');
-
+const cors = require('cors');
 const path=require('path')
 const app = express();
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
-
+app.use(cors());
 app.use(express.static(path.join(__dirname,'public')))
 app.use(express.json({ extended: true }));
 app.use(cookieParser());

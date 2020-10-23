@@ -1,7 +1,10 @@
 
-
+import { AuthContext } from '../context'
 var urlJoin = require('url-join');
 export default class BaseApi{
+
+    static contextType = AuthContext
+
     constructor(component) {
         this.baseUrl = process.env.REACT_APP_API_URL;
         this._component=component
