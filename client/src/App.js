@@ -8,7 +8,7 @@ const loading = () => <div className="animated fadeIn pt-3 text-center">Loading.
 
 function App() {
   let token = getToken();
-  const [isAuth, setAuth] = useState(token!=null);
+  const [isAuth, setAuth] = useState(true);
   function onLogin() {
     setAuth(true);
   }
