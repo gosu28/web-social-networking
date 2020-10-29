@@ -1,70 +1,106 @@
-const User = require("../models/user");
+const User = require('../models/user');
+const sharp = require('sharp');
+const multer = require('multer');
+
+const multerStorage = multer.memoryStorage();
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an image! Please upload only images', 400), false);
+  }
+};
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+exports.uploadUserPhoto = upload.single('photo');
+
+exports.resizeUserPhoto = async (req, res, next) => {
+  try {
+    if (!req.file) return next();
+    req.file.filename = `post-${req.user.id}-${Date.now()}.jpeg`;
+    await sharp(req.file.buffer)
+      .resize(620, 690)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/image/users/${req.file.filename}`);
+    next();
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
 
 const filterObj = (obj, ...allowedFields) => {
-    const newObj = {}
-    Object.keys(obj).forEach(el => {
-        if(allowedFields.includes(el)) newObj[el]=obj[el]
-    })
-    return newObj;
-}
+  const newObj = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el)) newObj[el] = obj[el];
+  });
+  return newObj;
+};
 exports.userById = async (req, res, next, id) => {
-    try {
-        const user = await User.findById(id);
-        if (!user) {
-            res.status(400).json({
-                status: 'fail',
-                message:'User not found'
-            })
-        }
-        req.profile = user;
-        next();
-    } catch (error) {
-        res.status(400).json({
-            status: 'fail',
-            message:error
-        })
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      res.status(400).json({
+        status: 'fail',
+        message: 'User not found',
+      });
     }
-    
-
-}
-exports.allUsers =async (req, res) => {
-    try {
-        const users =await User.find();
-        res.status(200).json({
-            status: 'success',
-            message:users
-        })
-    } catch (error) {
-        res.status(400).json({
-            status: 'fail',
-            message:error
-        })
-    }
-}
-exports.getUser = (req, res) => {
+    req.profile = user;
+    next();
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
+exports.allUsers = async (req, res) => {
+  try {
+    const users = await User.find();
     res.status(200).json({
-        status: 'success',
-        user:req.user
-    })
-}
+      status: 'success',
+      message: users,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
+};
+exports.getUser = (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    user: req.user,
+  });
+};
 exports.updateUser = async (req, res) => {
-    try {
-        const filteredBody = filterObj(req.body, 'name', 'email');
-        const updateUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
-            new: true,
-            runValidators: true
-        });
-        res.status(200).json({
-            status: 'success',
-            data: {
-                user:updateUser
-            }
-        })
-    } catch (error) {
-        res.status(404).json({
-            status: 'fail',
-            message: err
-        });
-    }
-    
-}
+  try {
+    const filteredBody = filterObj(req.body, 'name', 'email');
+    if (req.file) filteredBody.photo = req.file.filename;
+    const updateUser = await User.findByIdAndUpdate(
+      req.user._id,
+      filteredBody,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user: updateUser,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};

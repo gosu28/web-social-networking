@@ -1,34 +1,40 @@
 import React, { useState } from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
-import Login from './screens/Auth/Login'
-import { AuthContext } from "./context";
-const DefaultLayout = React.lazy(() => import('./containers/DefaultLayout/DefaultLayout'));
+import Login from './screens/Auth/Login';
+import { AuthContext } from './context';
+const DefaultLayout = React.lazy(() =>
+  import('./containers/DefaultLayout/DefaultLayout'),
+);
 
-const loading = () => <div className="animated fadeIn pt-3 text-center">Loading...</div>;
+const loading = () => (
+  <div className="animated fadeIn pt-3 text-center">Loading...</div>
+);
 
 function App() {
   let token = getToken();
-  const [isAuth, setAuth] = useState(true);
+
+  const [isAuth, setAuth] = useState(token != null);
   function onLogin() {
     setAuth(true);
   }
 
   function onLogout() {
-    localStorage.removeItem("token");
+    localStorage.removeItem('token');
     setAuth(false);
+    window.location.href = '/';
   }
 
   function getToken() {
     let access_token = null;
     var strToken = localStorage.getItem('token');
-    
+
     try {
       var token = JSON.parse(strToken);
-      
+
       if (token && token.token) {
         access_token = token.token;
-        
-        setAuth(true)
+
+        setAuth(true);
       } else {
         access_token = null;
       }
@@ -41,18 +47,21 @@ function App() {
   return (
     <HashRouter>
       <AuthContext.Provider value={{ isAuth, onLogin, onLogout }}>
-        {isAuth ?
+        {isAuth ? (
           <React.Suspense fallback={loading()}>
             <Switch>
-              <Route path="/" name="Home" render={props => <DefaultLayout {...props} />} />
+              <Route
+                path="/"
+                name="Home"
+                render={(props) => <DefaultLayout {...props} />}
+              />
             </Switch>
           </React.Suspense>
-          :
-          <Login />}
+        ) : (
+          <Login />
+        )}
       </AuthContext.Provider>
     </HashRouter>
-      
-       
   );
 }
 export default App;
