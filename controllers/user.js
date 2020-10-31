@@ -39,6 +39,7 @@ const filterObj = (obj, ...allowedFields) => {
   Object.keys(obj).forEach((el) => {
     if (allowedFields.includes(el)) newObj[el] = obj[el];
   });
+
   return newObj;
 };
 exports.userById = async (req, res, next, id) => {
@@ -64,7 +65,7 @@ exports.allUsers = async (req, res) => {
     const users = await User.find();
     res.status(200).json({
       status: 'success',
-      message: users,
+      data: users,
     });
   } catch (error) {
     res.status(400).json({
@@ -81,7 +82,13 @@ exports.getUser = (req, res) => {
 };
 exports.updateUser = async (req, res) => {
   try {
-    const filteredBody = filterObj(req.body, 'name', 'email');
+    const filteredBody = filterObj(
+      req.body,
+      'name',
+      'email',
+      'bio',
+      'fullname',
+    );
     if (req.file) filteredBody.photo = req.file.filename;
     const updateUser = await User.findByIdAndUpdate(
       req.user._id,

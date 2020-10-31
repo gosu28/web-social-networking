@@ -1,7 +1,13 @@
 const mongoose = require('mongoose');
 const { default: validator } = require('validator');
 const bcrypt = require('bcryptjs');
+const { ObjectId } = mongoose.Schema.Types;
 const UserSchema = new mongoose.Schema({
+  fullname: {
+    type: String,
+    required: [true, 'Please enter your fullname'],
+    trim: true,
+  },
   name: {
     type: String,
     required: [true, 'Please tell us your name!'],
@@ -17,6 +23,22 @@ const UserSchema = new mongoose.Schema({
   photo: {
     type: String,
     default: 'default.jpg',
+  },
+
+  followers: [{ type: ObjectId, ref: 'User' }],
+  followersCount: {
+    type: Number,
+    default: 0,
+  },
+  followingCount: {
+    type: Number,
+    default: 0,
+  },
+  following: [{ type: ObjectId, ref: 'User' }],
+  posts: [{ type: mongoose.Schema.ObjectId, ref: 'Post' }],
+  postCount: {
+    type: Number,
+    default: 0,
   },
   password: {
     type: String,
@@ -36,6 +58,7 @@ const UserSchema = new mongoose.Schema({
   },
   updated: Date,
   photo: String,
+  bio: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
 });

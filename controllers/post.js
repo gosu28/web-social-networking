@@ -5,6 +5,7 @@ const AppError = require('../errors/appError');
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
+const User = require('../models/user');
 const multerStorage = multer.memoryStorage();
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
@@ -41,7 +42,6 @@ exports.resizePostPhoto = async (req, res, next) => {
     if (!req.file) return next();
     req.file.filename = `post-${req.user.id}-${Date.now()}.jpeg`;
     await sharp(req.file.buffer)
-      .resize(620, 690)
       .toFormat('jpeg')
       .jpeg({ quality: 90 })
       .toFile(`public/image/posts/${req.file.filename}`);
@@ -74,8 +74,8 @@ exports.postByUser = async (req, res) => {
 exports.getPosts = async (req, res) => {
   try {
     const post = await Post.find()
-      .populate('postedBy', '_id name')
-      .select('_id title content created likes comments')
+      .populate('postedBy', '_id name photo')
+      .select('_id title content created likes comments photo')
       .sort({ created: -1 });
     res.status(200).json({
       status: 'success',
@@ -99,13 +99,19 @@ exports.getPost = (req, res) => {
 exports.createPost = async (req, res) => {
   try {
     const newPost = new Post(req.body);
+    console.log(newPost);
     if (req.file) newPost.photo = req.file.filename;
     newPost.postedBy = req.user;
-    await newPost.save();
+
+    let post = await newPost.save();
+    await User.findByIdAndUpdate(req.user.id, {
+      $push: { posts: post._id },
+      $inc: { postCount: 1 },
+    });
     res.status(201).json({
       status: 'success',
       data: {
-        post: newPost,
+        post: post,
       },
     });
   } catch (err) {
@@ -139,14 +145,6 @@ exports.deletePost = async (req, res) => {
 };
 exports.updatePost = async (req, res) => {
   try {
-    // let isPoster = req.post && req.user && req.post.postedBy._id == req.user._id;
-    // if (!isPoster)
-    // {
-    //     return res.status(403).json({
-    //         err: ' User is not authorized'
-    //       });
-
-    // }
     let updatePost = req.post;
 
     updatePost = _.extend(updatePost, req.body);

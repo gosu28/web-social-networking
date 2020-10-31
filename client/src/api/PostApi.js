@@ -1,18 +1,18 @@
 import BaseApi from './BaseApi';
 
-export default class UserApi extends BaseApi {
-  getUser = async () => {
+export default class PostApi extends BaseApi {
+  getPosts = async () => {
     try {
-      let urlBase = this.makeUrl('users', 'singleUser');
+      let urlBase = this.makeUrl('feed');
       let result = await this.execute_get(urlBase);
       return result;
     } catch (error) {
       console.error(error);
     }
   };
-  getAllUser = async () => {
+  getPostByUser = async () => {
     try {
-      let urlBase = this.makeUrl('users', 'allUsers');
+      let urlBase = this.makeUrl('postByUser');
       let result = await this.execute_get(urlBase);
       return result;
     } catch (error) {

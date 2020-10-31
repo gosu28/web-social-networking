@@ -3,6 +3,7 @@ const userController = require('../../controllers/user');
 const authController = require('../../controllers/authController');
 const router = express.Router();
 
+router.get('/allUsers', userController.allUsers);
 router.get('/singleUser', authController.protect, userController.getUser);
 router.patch(
   '/updateMe',
