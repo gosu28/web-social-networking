@@ -2,7 +2,7 @@ const express = require('express');
 const postController = require('../../controllers/post');
 const authController = require('../../controllers/authController');
 const router = express.Router();
-router.route('/feed').get(postController.getPosts);
+router.route('/feed').get(authController.protect, postController.getPosts);
 router
   .route('/post')
   .post(
@@ -13,7 +13,6 @@ router
   );
 router.get('/postByUser', authController.protect, postController.postByUser);
 
-router.delete('/:postId', authController.protect, postController.deletePost);
 router.put(
   '/:postId',
   authController.protect,
@@ -21,6 +20,16 @@ router.put(
   postController.resizePostPhoto,
   postController.updatePost,
 );
+router
+  .route('/:postId/togglelike')
+  .get(authController.protect, postController.toggleLike);
 router.get('/:postId', authController.protect, postController.getPost);
+router.delete('/:postId', authController.protect, postController.deletePost);
+router
+  .route('/:postId/comments')
+  .post(authController.protect, postController.addComment);
+router
+  .route('/:postId/comments/:commentId')
+  .delete(authController.protect, postController.deleteComment);
 router.param('postId', postController.postById);
 module.exports = router;

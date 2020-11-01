@@ -60,7 +60,7 @@ export default class Post extends Component {
                 <ul className="list-inline d-flex flex-row align-items-center m-0">
                   <li className="list-inline-item">
                     <button className="btn p-0">
-                      <HeartIcon />
+                      <LikePost />
                     </button>
                   </li>
                   <li className="list-inline-item ml-2">

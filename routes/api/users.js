@@ -12,5 +12,11 @@ router.patch(
   userController.resizeUserPhoto,
   userController.updateUser,
 );
-// router.param('userId', userController.userById);
+router
+  .route('/:userId/follow')
+  .get(authController.protect, userController.follow);
+router
+  .route('/:userId/unfollow')
+  .get(authController.protect, userController.unfollow);
+router.param('userId', userController.userById);
 module.exports = router;

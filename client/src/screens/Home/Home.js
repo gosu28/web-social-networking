@@ -19,10 +19,10 @@ export default class Home extends Component {
   }
   getFeedData = async () => {
     let res = await this.PostApi.getPosts();
-
-    if (res && res.status === 'success') {
+    console.log(res);
+    if (res && res.success) {
       this.setState({
-        data: res.data.post,
+        data: res.data,
       });
     }
   };

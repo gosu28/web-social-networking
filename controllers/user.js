@@ -111,3 +111,52 @@ exports.updateUser = async (req, res) => {
     });
   }
 };
+exports.follow = async (req, res) => {
+  const user = req.profile;
+  if (user.id == req.user.id) {
+    return next(
+      res.status(400).json({
+        status: 'fail',
+        message: "You can't unfollow/follow yourself",
+      }),
+    );
+  }
+  if (user.followers.includes(req.user.id)) {
+    return next(
+      res.status(400).json({
+        status: 'fail',
+        message: 'You are already following him',
+      }),
+    );
+  }
+  await User.findByIdAndUpdate(user.id, {
+    $push: { followers: req.user.id },
+    $inc: { followersCount: 1 },
+  });
+  await User.findByIdAndUpdate(req.user.id, {
+    $push: { following: user.id },
+    $inc: { followingCount: 1 },
+  });
+  res.status(200).json({ success: true, data: {} });
+};
+exports.unfollow = async (req, res) => {
+  const user = req.profile;
+  if (user.id === req.user.id) {
+    return next(
+      res.status(400).json({
+        status: 'fail',
+        message: "You can't follow/unfollow yourself",
+      }),
+    );
+  }
+  await User.findByIdAndUpdate(user.id, {
+    $pull: { followers: req.user.id },
+    $inc: { followersCount: -1 },
+  });
+  await User.findByIdAndUpdate(req.user.id, {
+    $pull: { following: user.id },
+    $inc: { followingCount: -1 },
+  });
+
+  res.status(200).json({ success: true, data: {} });
+};
