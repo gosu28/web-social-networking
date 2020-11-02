@@ -23,6 +23,9 @@ router.put(
 router
   .route('/:postId/togglelike')
   .get(authController.protect, postController.toggleLike);
+router
+  .route('/:id/getComment')
+  .get(authController.protect, postController.getComment);
 router.get('/:postId', authController.protect, postController.getPost);
 router.delete('/:postId', authController.protect, postController.deletePost);
 router

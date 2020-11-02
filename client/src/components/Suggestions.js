@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import UserApi from '../api/UserApi';
+import Follow from './Follow';
 export default class Suggestions extends Component {
   constructor(props) {
     super(props);
@@ -14,7 +15,7 @@ export default class Suggestions extends Component {
   getAllUser = async () => {
     let res = await this.UserApi.getAllUser();
 
-    if (res && res.status === 'success') {
+    if (res && res.success) {
       this.setState({
         users: res.data,
       });
@@ -29,7 +30,7 @@ export default class Suggestions extends Component {
     const photo = `${process.env.REACT_APP_URL}image/users/${user.photo}`;
     return (
       <div
-        className="col-2 mt-4 mb-4"
+        className="col-3 mt-4 mb-4 pr-4"
         style={{ position: 'fixed', left: '61%', top: '13%' }}
       >
         <div className="d-flex flex-row align-items-center">
@@ -62,7 +63,10 @@ export default class Suggestions extends Component {
           <div>
             {users &&
               users.map((user) => (
-                <div className="d-flex flex-row justify-content-between align-items-center mt-3 mb-3">
+                <div
+                  className="d-flex flex-row justify-content-between align-items-center mt-3 mb-3"
+                  key={user._id}
+                >
                   <div className="d-flex flex-row align-items-center">
                     <div className="rounded-circle overflow-hidden d-flex justify-content-center align-items-center border sugest-profile-photo">
                       <img
@@ -80,9 +84,10 @@ export default class Suggestions extends Component {
                       {user.name}
                     </strong>
                   </div>
-                  <button className="btn  btn-sm p-0 btn-ig ">
+                  {/* <button className="btn  btn-sm p-0 btn-ig ">
                     <span style={{ color: '#0095f6' }}>Follow</span>
-                  </button>
+                  </button> */}
+                  <Follow isFollowing={user.isFollowing} userId={user._id} />
                 </div>
               ))}
           </div>

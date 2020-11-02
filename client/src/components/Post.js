@@ -11,13 +11,40 @@ import {
   HeartIcon,
 } from './Icons';
 import Comment from './Comment';
+import PostApi from '../api/PostApi';
 
 export default class Post extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      newComments: [],
+      likes: this.props.post.likesCount,
+      text: '',
+    };
+    this.PostApi = new PostApi();
   }
+  incLikes = () => {
+    this.setState({ likes: this.state.likes + 1 });
+  };
+  decLikes = () => {
+    this.setState({ likes: this.state.likes - 1 });
+  };
+  handleAddComment = async (e) => {
+    const { post } = this.props;
+    const { text, newComments } = this.state;
+    const comment = { text };
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      const newComment = await this.PostApi.addComment(post._id, comment);
+      this.setState((e) => ({
+        text: '',
+        newComments: [...e.newComments, newComment],
+      }));
+    }
+  };
   render() {
     const { post } = this.props;
+    const { newComments, likes, text } = this.state;
     const photoUrl = `${process.env.REACT_APP_URL}image/posts/${post.photo}`;
     const AvatarUrl = `${process.env.REACT_APP_URL}image/users/${post.postedBy.photo}`;
 
@@ -60,7 +87,12 @@ export default class Post extends Component {
                 <ul className="list-inline d-flex flex-row align-items-center m-0">
                   <li className="list-inline-item">
                     <button className="btn p-0">
-                      <LikePost />
+                      <LikePost
+                        isLiked={post.isLiked}
+                        postId={post._id}
+                        incLikes={this.incLikes}
+                        decLikes={this.decLikes}
+                      />
                     </button>
                   </li>
                   <li className="list-inline-item ml-2">
@@ -81,24 +113,33 @@ export default class Post extends Component {
                 </div>
               </div>
               <div className="pl-3 pr-3 pb-2">
-                {post.likes.length !== 0 && (
+                {likes !== 0 && (
                   <strong className="d-block">
-                    {post.likes.length}
-                    {post.likes.length > 1 ? 'likes' : 'like'}
+                    {likes}
+                    {likes > 1 ? ' likes' : ' like'}
                   </strong>
                 )}
                 <strong className="d-block">{post.postedBy.name}</strong>
                 <p className="d-block mb-1">{post.content}</p>
-                {post.comments.length > 2 && (
+                {post.commentsCount > 2 && (
                   <button className="btn p-0">
                     <span className="text-muted">
-                      View all {post.comments.length} comments
+                      View all {post.commentsCount} comments
                     </span>
                   </button>
                 )}
                 {post.comments?.slice(0, 2).map((comment) => (
-                  <Comment />
+                  <Comment key={comment} comment={comment} />
                 ))}
+                {newComments.map((comment) => {
+                  console.log(comment.data);
+                  return (
+                    <Comment
+                      key={comment.data._id}
+                      comment={comment.data._id}
+                    />
+                  );
+                })}
                 <small className="text-muted">{post.created}</small>
               </div>
               <div className="position-relative comment-box">
@@ -106,12 +147,26 @@ export default class Post extends Component {
                   <input
                     className="w-100 border-0 p-3 input-post"
                     placeholder="Add a comment..."
+                    onChange={(value) =>
+                      this.setState({ text: value.target.value })
+                    }
+                    onKeyDown={this.handleAddComment}
+                    value={text}
                   />
                   <button className="btn  position-absolute btn-ig">
                     <span style={{ color: '#0095f6' }}>Post</span>
                   </button>
                 </form>
               </div>
+              {/* <div className="add-comment com">
+                <textarea
+                  columns="3"
+                  placeholder="Add a Comment"
+                  value={comment.value}
+                  onChange={(value) => this.setState({ comment: value })}
+                  onKeyDown={this.handleAddComment}
+                ></textarea>
+              </div> */}
             </div>
           </div>
         </div>

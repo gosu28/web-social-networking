@@ -19,7 +19,6 @@ export default class Home extends Component {
   }
   getFeedData = async () => {
     let res = await this.PostApi.getPosts();
-    console.log(res);
     if (res && res.success) {
       this.setState({
         data: res.data,

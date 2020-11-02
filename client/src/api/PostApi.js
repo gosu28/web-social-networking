@@ -19,4 +19,31 @@ export default class PostApi extends BaseApi {
       console.error(error);
     }
   };
+  toggleLike = async (id) => {
+    try {
+      let urlBase = this.makeUrl(`${id}`, 'togglelike');
+      let result = await this.execute_get(urlBase);
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  getComment = async (id) => {
+    try {
+      let urlBase = this.makeUrl(`${id}`, 'getComment');
+      let result = await this.execute_get(urlBase);
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  addComment = async (id, comment) => {
+    try {
+      let urlBase = this.makeUrl(`${id}`, 'comments');
+      let result = await this.execute_post(urlBase, comment);
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 }

@@ -98,13 +98,13 @@ exports.getPosts = async (req, res) => {
       if (post.postedBy._id.toString() === req.user.id) {
         post.isMine = true;
       }
-      post.comments.map(async (id) => {
-        const comment = await Comment.find({ _id: id });
-        comment.isCommentMine = false;
-        if (comment.user.toString() === req.user.id) {
-          comment.isCommentMine = true;
-        }
-      });
+      // post.comments.map(async (id) => {
+      //   let comment = await Comment.findById(id);
+      //   comment.isCommentMine = false;
+      //   if (comment.user === req.user.id) {
+      //     comment.isCommentMine = true;
+      //   }
+      // });
     });
     res.status(200).json({ success: true, data: posts });
   } catch (error) {
@@ -225,7 +225,15 @@ exports.addComment = async (req, res) => {
     .execPopulate();
   res.status(200).json({ success: true, data: comment });
 };
-
+exports.getComment = async (req, res) => {
+  let comment = await Comment.findById(req.params.id).lean().exec();
+  comment.isCommentMine = false;
+  const userStr = comment.user.toString();
+  if (userStr === req.user.id) {
+    comment.isCommentMine = true;
+  }
+  res.status(200).json({ success: true, data: comment });
+};
 exports.toggleLike = async (req, res) => {
   const post = req.post;
   if (post.likes.includes(req.user.id)) {

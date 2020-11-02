@@ -60,13 +60,25 @@ exports.userById = async (req, res, next, id) => {
     });
   }
 };
+exports.getUserById = async (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    user: req.profile,
+  });
+};
 exports.allUsers = async (req, res) => {
   try {
-    const users = await User.find();
-    res.status(200).json({
-      status: 'success',
-      data: users,
+    let users = await User.find().lean().exec();
+    users.forEach((user) => {
+      user.isFollowing = false;
+      const followers = user.followers.map((follower) => follower.toString());
+
+      if (followers.includes(req.user.id)) {
+        user.isFollowing = true;
+      }
     });
+    users = users.filter((user) => user._id.toString() !== req.user.id);
+    res.status(200).json({ success: true, data: users });
   } catch (error) {
     res.status(400).json({
       status: 'fail',
