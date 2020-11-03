@@ -39,6 +39,7 @@ exports.postById = async (req, res, next, id) => {
 exports.resizePostPhoto = async (req, res, next) => {
   try {
     if (!req.file) return next();
+
     req.file.filename = `post-${req.user.id}-${Date.now()}.jpeg`;
     await sharp(req.file.buffer)
       .toFormat('jpeg')
@@ -123,7 +124,7 @@ exports.getPost = (req, res) => {
 exports.createPost = async (req, res) => {
   try {
     const newPost = new Post(req.body);
-    console.log(newPost);
+
     if (req.file) newPost.photo = req.file.filename;
     newPost.postedBy = req.user;
 
@@ -217,7 +218,7 @@ exports.addComment = async (req, res) => {
   });
 
   post.comments.push(comment);
-  console.log(post.comments);
+
   post.commentsCount = post.commentsCount + 1;
   await post.save();
   comment = await comment

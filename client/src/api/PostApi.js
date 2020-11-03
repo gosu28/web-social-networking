@@ -46,4 +46,13 @@ export default class PostApi extends BaseApi {
       console.error(error);
     }
   };
+  addNewPost = async (file, content) => {
+    try {
+      let urlBase = this.makeUrl('post');
+      let result = await this.uploadFile(urlBase, file, content);
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 }

@@ -74,4 +74,47 @@ export default class BaseApi {
     if (token === undefined) window.location.href = '/login';
     return JSON.parse(token);
   };
+  uploadFile = async (url, files, obj) => {
+    var data = new FormData();
+    // for (var i = 0; i < files.length; i++) {
+    //   let c = files[i];
+    //   data.append('file' + i + 1, c);
+    //   if (obj !== undefined) {
+    //     data.append('data', JSON.stringify(obj));
+    //   }
+    // }
+    data.append('photo', files);
+    if (obj !== undefined) {
+      Object.keys(obj).forEach((el) => {
+        data.append(el, obj[el]);
+      });
+    }
+    var access_token = undefined;
+
+    var token = localStorage.getItem('token');
+    if (token) {
+      access_token = token;
+    } else {
+      access_token = null;
+    }
+    var headers = {
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + access_token,
+    };
+
+    let response = await fetch(url, {
+      method: 'POST',
+      body: data,
+      headers: headers,
+    });
+    console.log(response);
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+      }
+    }
+
+    let responseJson = await response.json();
+    return responseJson;
+  };
 }
