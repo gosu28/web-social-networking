@@ -8,6 +8,7 @@ const path = require('path');
 const User = require('../models/user');
 const multerStorage = multer.memoryStorage();
 const Comment = require('../models/comment');
+const { populate } = require('../models/user');
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
     cb(null, true);
@@ -21,9 +22,9 @@ const upload = multer({
 });
 exports.uploadPostPhoto = upload.single('photo');
 
-exports.postById = async (req, res, next, id) => {
+exports.postById = async (req, res, next, _id) => {
   try {
-    const post = await Post.findById(id);
+    const post = await Post.findById(_id);
 
     req.post = post;
 
@@ -40,7 +41,7 @@ exports.resizePostPhoto = async (req, res, next) => {
   try {
     if (!req.file) return next();
 
-    req.file.filename = `post-${req.user.id}-${Date.now()}.jpeg`;
+    req.file.filename = `post-${req.user._id}-${Date.now()}.jpeg`;
     await sharp(req.file.buffer)
       .toFormat('jpeg')
       .jpeg({ quality: 90 })
@@ -77,12 +78,17 @@ exports.getPosts = async (req, res) => {
 
     const users = await User.find()
       .where('_id')
-      .in(following.concat([req.user.id]))
+      .in(following.concat([req.user._id]))
       .exec();
 
     const postId = users.map((user) => user.posts).flat();
-    const posts = await Post.find()
+    const posts = await Post.find({})
       .populate({ path: 'postedBy', select: 'photo fullname name' })
+      .populate({
+        path: 'comments',
+        select: 'text user',
+        populate: { path: 'user', select: 'name fullname' },
+      })
       .sort('-created')
       .where('_id')
       .in(postId)
@@ -92,20 +98,19 @@ exports.getPosts = async (req, res) => {
     posts.forEach((post) => {
       post.isLiked = false;
       const likes = post.likes.map((like) => like.toString());
-      if (likes.includes(req.user.id)) {
+      if (likes.includes(req.user._id)) {
         post.isLiked = true;
       }
       post.isMine = false;
-      if (post.postedBy._id.toString() === req.user.id) {
+      if (post.postedBy._id.toString() === req.user._id) {
         post.isMine = true;
       }
-      // post.comments.map(async (id) => {
-      //   let comment = await Comment.findById(id);
-      //   comment.isCommentMine = false;
-      //   if (comment.user === req.user.id) {
-      //     comment.isCommentMine = true;
-      //   }
-      // });
+      post.comments.map((comment) => {
+        comment.isCommentMine = false;
+        if (comment.user._id.toString() === req.user.id) {
+          comment.isCommentMine = true;
+        }
+      });
     });
     res.status(200).json({ success: true, data: posts });
   } catch (error) {
@@ -129,8 +134,8 @@ exports.createPost = async (req, res) => {
     newPost.postedBy = req.user;
 
     let post = await newPost.save();
-    await User.findByIdAndUpdate(req.user.id, {
-      $push: { posts: post._id },
+    await User.findByIdAndUpdate(req.user._id, {
+      $push: { posts: newPost },
       $inc: { postCount: 1 },
     });
     res.status(201).json({
@@ -149,15 +154,15 @@ exports.createPost = async (req, res) => {
 
 exports.deletePost = async (req, res) => {
   try {
-    if (req.post.postedBy.toString() !== req.user.id) {
+    if (req.post.postedBy.toString() !== req.user._id) {
       return next({
         message: 'You are not authorized to delete this post',
         statusCode: 401,
       });
     }
 
-    await User.findByIdAndUpdate(req.user.id, {
-      $pull: { posts: req.post.id },
+    await User.findByIdAndUpdate(req.user._id, {
+      $pull: { posts: req.post._id },
       $inc: { postCount: -1 },
     });
 
@@ -212,7 +217,7 @@ exports.updatePost = async (req, res) => {
 exports.addComment = async (req, res) => {
   const post = req.post;
   let comment = await Comment.create({
-    user: req.user.id,
+    user: req.user._id,
     post: post._id,
     text: req.body.text,
   });
@@ -227,23 +232,23 @@ exports.addComment = async (req, res) => {
   res.status(200).json({ success: true, data: comment });
 };
 exports.getComment = async (req, res) => {
-  let comment = await Comment.findById(req.params.id).lean().exec();
+  let comment = await Comment.findById(req.params._id).lean().exec();
   comment.isCommentMine = false;
   const userStr = comment.user.toString();
-  if (userStr === req.user.id) {
+  if (userStr === req.user._id) {
     comment.isCommentMine = true;
   }
   res.status(200).json({ success: true, data: comment });
 };
 exports.toggleLike = async (req, res) => {
   const post = req.post;
-  if (post.likes.includes(req.user.id)) {
-    const index = post.likes.indexOf(req.user.id);
+  if (post.likes.includes(req.user._id)) {
+    const index = post.likes.indexOf(req.user._id);
     post.likes.splice(index, 1);
     post.likesCount = post.likesCount - 1;
     await post.save();
   } else {
-    post.likes.push(req.user.id);
+    post.likes.push(req.user._id);
     post.likesCount = post.likesCount + 1;
     await post.save();
   }
@@ -258,12 +263,12 @@ exports.deleteComment = async (req, res) => {
 
   if (!comment) {
     return next({
-      message: `No comment found for id ${post._id}`,
+      message: `No comment found for _id ${post._id}`,
       statusCode: 404,
     });
   }
 
-  if (comment.user.toString() !== req.user.id) {
+  if (comment.user.toString() !== req.user._id) {
     return next({
       message: 'You are not authorized to delete this comment',
       statusCode: 401,

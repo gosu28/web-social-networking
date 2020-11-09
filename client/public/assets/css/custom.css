@@ -341,8 +341,12 @@ textarea::-webkit-scrollbar {
 
 .link-menu {
   color: black;
+  text-decoration: none;
 }
-
+.link-menu:hover {
+  color: black;
+  text-decoration: none;
+}
 .topbar-profile-photo {
   width: 1.5em;
   height: 1.5em;
@@ -463,17 +467,37 @@ textarea::-webkit-scrollbar {
   padding-right: 16px;
 }
 .post-preview-wrapper {
+  justify-content: center;
+  align-items: center;
   margin-top: 1rem;
   cursor: pointer;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: 1.5rem;
+  grid-gap: 1rem;
+}
+.profile-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1.4rem 0;
+}
+.profile-tab div {
+  display: flex;
+  cursor: pointer;
+  margin-right: 3rem;
+}
+.profile-tab span {
+  padding-left: 0.3rem;
+}
+.profile-tab svg {
+  height: 24px;
+  width: 24px;
 }
 .post-preview-wrapper img {
   border-radius: 4px;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
-  width: 300px;
-  height: 300px;
+  width: 260px;
+  height: 260px;
   object-fit: cover;
 }
 .container-overlay {
@@ -490,8 +514,8 @@ textarea::-webkit-scrollbar {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.6);
-  width: 300px;
-  height: 300px;
+  width: 260px;
+  height: 260px;
   z-index: 4;
   display: none;
 }
@@ -639,4 +663,18 @@ textarea::-webkit-scrollbar {
   left: 0px;
   z-index: 5;
   background-color: rgba(0, 0, 0, 0.8);
+}
+.placeholder_wrapper {
+  margin: auto;
+  margin-top: 4rem;
+  width: 450px;
+  text-align: center;
+}
+.placeholder_wrapper p {
+  padding-top: 0.3rem;
+}
+.placeholder_wrapper svg {
+  height: 50px;
+  width: 50px;
+  margin-bottom: 1rem;
 }

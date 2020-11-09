@@ -31,7 +31,7 @@ export default class Post extends Component {
   };
   handleAddComment = async (e) => {
     const { post } = this.props;
-    const { text, newComments } = this.state;
+    const { text } = this.state;
     const comment = { text };
     if (e.keyCode === 13) {
       e.preventDefault();
@@ -49,7 +49,7 @@ export default class Post extends Component {
     const AvatarUrl = `${process.env.REACT_APP_URL}image/users/${post.postedBy.photo}`;
 
     return (
-      <div className="col-8">
+      <div>
         {/* START OF POSTS */}
         <div className="d-flex flex-column mt-4 mb-4">
           <div className="card">
@@ -132,12 +132,8 @@ export default class Post extends Component {
                   <Comment key={comment} comment={comment} />
                 ))}
                 {newComments.map((comment) => {
-                  console.log(comment.data);
                   return (
-                    <Comment
-                      key={comment.data._id}
-                      comment={comment.data._id}
-                    />
+                    <Comment key={comment.data._id} comment={comment.data} />
                   );
                 })}
                 <small className="text-muted">{post.created}</small>
@@ -153,9 +149,12 @@ export default class Post extends Component {
                     onKeyDown={this.handleAddComment}
                     value={text}
                   />
-                  <button className="btn  position-absolute btn-ig">
+                  {/* <button
+                    className="btn  position-absolute btn-ig"
+                    onClick={this.handleAddComment}
+                  >
                     <span style={{ color: '#0095f6' }}>Post</span>
-                  </button>
+                  </button> */}
                 </form>
               </div>
               {/* <div className="add-comment com">

@@ -19,7 +19,7 @@ exports.uploadUserPhoto = upload.single('photo');
 exports.resizeUserPhoto = async (req, res, next) => {
   try {
     if (!req.file) return next();
-    req.file.filename = `post-${req.user.id}-${Date.now()}.jpeg`;
+    req.file.filename = `post-${req.user._id}-${Date.now()}.jpeg`;
     await sharp(req.file.buffer)
       .resize(620, 690)
       .toFormat('jpeg')
@@ -42,9 +42,15 @@ const filterObj = (obj, ...allowedFields) => {
 
   return newObj;
 };
-exports.userById = async (req, res, next, id) => {
+exports.userById = async (req, res, next, _id) => {
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(_id)
+      .select('-password')
+      .populate('posts', 'photo commentsCount likesCount')
+      .populate({ path: 'followers', select: 'photo username fullname' })
+      .populate({ path: 'following', select: 'photo username fullname' })
+      .lean()
+      .exec();
     if (!user) {
       res.status(400).json({
         status: 'fail',
@@ -61,18 +67,40 @@ exports.userById = async (req, res, next, id) => {
   }
 };
 exports.getUserById = async (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    user: req.profile,
+  const user = req.profile;
+
+  user.isFollowing = false;
+  const followers = user.followers.map((follower) => follower._id.toString());
+
+  user.followers.forEach((follower) => {
+    follower.isFollowing = false;
+    if (req.user.following.includes(follower._id.toString())) {
+      follower.isFollowing = true;
+    }
   });
+
+  user.following.forEach((user) => {
+    user.isFollowing = false;
+    if (req.user.following.includes(user._id.toString())) {
+      user.isFollowing = true;
+    }
+  });
+
+  if (followers.includes(req.user.id)) {
+    user.isFollowing = true;
+  }
+
+  user.isMe = req.user.id === user._id.toString();
+
+  res.status(200).json({ success: true, user: user });
 };
 exports.allUsers = async (req, res) => {
   try {
-    let users = await User.find().lean().exec();
+    let users = await User.find().select('-password').lean().exec();
     users.forEach((user) => {
       user.isFollowing = false;
       const followers = user.followers.map((follower) => follower.toString());
-
+      console.log(followers.includes(req.user.id));
       if (followers.includes(req.user.id)) {
         user.isFollowing = true;
       }
@@ -125,7 +153,7 @@ exports.updateUser = async (req, res) => {
 };
 exports.follow = async (req, res) => {
   const user = req.profile;
-  if (user.id == req.user.id) {
+  if (user._id == req.user._id) {
     return next(
       res.status(400).json({
         status: 'fail',
@@ -133,7 +161,7 @@ exports.follow = async (req, res) => {
       }),
     );
   }
-  if (user.followers.includes(req.user.id)) {
+  if (user.followers.includes(req.user._id)) {
     return next(
       res.status(400).json({
         status: 'fail',
@@ -141,19 +169,19 @@ exports.follow = async (req, res) => {
       }),
     );
   }
-  await User.findByIdAndUpdate(user.id, {
-    $push: { followers: req.user.id },
+  await User.findByIdAndUpdate(user._id, {
+    $push: { followers: req.user._id },
     $inc: { followersCount: 1 },
   });
-  await User.findByIdAndUpdate(req.user.id, {
-    $push: { following: user.id },
+  await User.findByIdAndUpdate(req.user._id, {
+    $push: { following: user._id },
     $inc: { followingCount: 1 },
   });
   res.status(200).json({ success: true, data: {} });
 };
 exports.unfollow = async (req, res) => {
   const user = req.profile;
-  if (user.id === req.user.id) {
+  if (user._id === req.user._id) {
     return next(
       res.status(400).json({
         status: 'fail',
@@ -161,12 +189,12 @@ exports.unfollow = async (req, res) => {
       }),
     );
   }
-  await User.findByIdAndUpdate(user.id, {
-    $pull: { followers: req.user.id },
+  await User.findByIdAndUpdate(user._id, {
+    $pull: { followers: req.user._id },
     $inc: { followersCount: -1 },
   });
-  await User.findByIdAndUpdate(req.user.id, {
-    $pull: { following: user.id },
+  await User.findByIdAndUpdate(req.user._id, {
+    $pull: { following: user._id },
     $inc: { followingCount: -1 },
   });
 

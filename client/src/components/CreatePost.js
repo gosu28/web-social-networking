@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PostApi from '../api/PostApi';
 import PostImageUpload from './PostImageUpload';
+import UserApi from '../api/UserApi';
 import { Redirect } from 'react-router-dom';
 export default class CreatePost extends Component {
   constructor(props) {
@@ -11,6 +12,7 @@ export default class CreatePost extends Component {
       content: '',
     };
     this.PostApi = new PostApi();
+    this.UserApi = new UserApi();
   }
   handleOnFocus = () => {
     this.setState({ isFocused: true });
@@ -21,6 +23,17 @@ export default class CreatePost extends Component {
       photo: '',
       content: '',
     });
+  };
+  componentDidMount = () => {
+    this.getUserData();
+  };
+  getUserData = async () => {
+    let res = await this.UserApi.getUser();
+    if (res && res.status === 'success') {
+      this.setState({
+        userData: res.user,
+      });
+    }
   };
   handleTitleChange = (e) => this.setState({ content: e.target.value });
   handlePostImageUpload = (e) => {
@@ -47,13 +60,17 @@ export default class CreatePost extends Component {
   };
   render() {
     const isShareDisabled = true;
-    const { isFocused, photo, content } = this.state;
+    const { isFocused, photo, content, userData } = this.state;
+
+    const photoUrl = userData
+      ? `${process.env.REACT_APP_URL}image/users/${userData.photo}`
+      : 'assets/images/default.jpg';
     return (
       <>
         {isFocused && (
           <div className="create_post_overlay" onClick={this.handleReset}></div>
         )}
-        <div class="col-8 create_post" style={{ width: 523 }}>
+        <div class="create_post" style={{ width: '100%' }}>
           <form>
             <div className="create_post_wrapper">
               <div
@@ -66,7 +83,7 @@ export default class CreatePost extends Component {
                 }}
               >
                 <img
-                  src="assets/images/avatar.jpg"
+                  src={photoUrl}
                   alt="..."
                   style={{
                     width: '100%',

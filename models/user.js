@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
     default: 'default.jpg',
   },
 
-  followers: [{ type: ObjectId, ref: 'User' }],
+  followers: [{ type: ObjectId, ref: 'user' }],
   followersCount: {
     type: Number,
     default: 0,
@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  following: [{ type: ObjectId, ref: 'User' }],
+  following: [{ type: ObjectId, ref: 'user' }],
   posts: [{ type: mongoose.Schema.ObjectId, ref: 'Post' }],
   postCount: {
     type: Number,

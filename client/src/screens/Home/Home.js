@@ -38,16 +38,20 @@ export default class Home extends Component {
     const { data, userData } = this.state;
 
     return (
-      <div className="mt-4">
+      <div className="mt-4" style={{ justifyContent: 'start' }}>
         <div className="container d-flex justify-content-center">
           <div className="col-9">
-            <CreatePost />
             {data.length > 0 ? (
               <div className="row">
-                {data.map((post) => (
-                  <Post key={post._id} post={post} />
-                ))}
-                {userData && <Suggestions user={userData} />}
+                <div className="col-8">
+                  <CreatePost />
+                  {data.map((post) => (
+                    <Post key={post._id} post={post} />
+                  ))}
+                </div>
+                <div className="col-4">
+                  {userData && <Suggestions user={userData} />}
+                </div>
               </div>
             ) : (
               <div></div>

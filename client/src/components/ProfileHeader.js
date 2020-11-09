@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Follow from './Follow';
 import { OptionsIcon } from './Icons';
 export default class ProfileHeader extends Component {
   constructor(props) {
@@ -7,6 +8,7 @@ export default class ProfileHeader extends Component {
   render() {
     const { user } = this.props;
     console.log(user);
+
     const photoUrl = user
       ? `${process.env.REACT_APP_URL}image/users/${user.photo}`
       : 'assets/images/default.jpg';
@@ -16,31 +18,36 @@ export default class ProfileHeader extends Component {
         <div className="profile-info">
           <div className="profile-meta">
             <h2>{user.name}</h2>
-            <div className="options">
-              <button
-                className="button-edit-profile"
-                //   onClick={() => history.push("/accounts/edit")}
-              >
-                Edit Profile
-              </button>
-              <OptionsIcon />
-            </div>
-            {/* {profile?.isMe ? (
+            {user?.isMe ? (
+              <div className="options">
+                <button
+                  className="button-edit-profile"
+                  //   onClick={() => history.push("/accounts/edit")}
+                >
+                  Edit Profile
+                </button>
+                <OptionsIcon />
+              </div>
+            ) : (
+              <Follow isFollowing={user.isFollowing} userId={user._id} />
+            )}
+
+            {/* {user?.isMe ? (
               <div className="options">
                 <Button
                   secondary
-                  onClick={() => history.push("/accounts/edit")}
+                  // onClick={() => history.push("/accounts/edit")}
                 >
                   Edit Profile
                 </Button>
-                <OptionsIcon onClick={handleLogout} />
+                <OptionsIcon />
               </div>
             ) : (
               <Follow
-                isFollowing={profile?.isFollowing}
+                isFollowing={user?.isFollowing}
                 incFollowers={incFollowers}
                 decFollowers={decFollowers}
-                userId={profile?._id}
+                userId={user?._id}
               />
             )} */}
           </div>

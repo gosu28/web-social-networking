@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import UserApi from '../api/UserApi';
 import Follow from './Follow';
 export default class Suggestions extends Component {
@@ -29,30 +30,30 @@ export default class Suggestions extends Component {
     const { users } = this.state;
     const photo = `${process.env.REACT_APP_URL}image/users/${user.photo}`;
     return (
-      <div
-        className="col-3 mt-4 mb-4 pr-4"
-        style={{ position: 'fixed', left: '61%', top: '13%' }}
-      >
-        <div className="d-flex flex-row align-items-center">
-          <div className="rounded-circle overflow-hidden d-flex justify-content-center align-items-center border sidenav-profile-photo">
-            <img
-              src={photo}
-              alt="..."
-              style={{
-                transform: 'scale(1.5)',
-                width: '100%',
-                position: 'absolute',
-                left: 0,
-              }}
-            />
+      <div>
+        <Link to={`/profile/${user._id}`} className="link-menu">
+          <div className="d-flex flex-row align-items-center">
+            <div className="rounded-circle overflow-hidden d-flex justify-content-center align-items-center border sidenav-profile-photo">
+              <img
+                src={photo}
+                alt="..."
+                style={{
+                  transform: 'scale(1.5)',
+                  width: '100%',
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                }}
+              />
+            </div>
+            <div className="profile-info ml-3">
+              <span className="profile-info-username">{user.name}</span>
+              <span className="profile-info-name" style={{ color: '#99b5d4' }}>
+                {user.fullname}
+              </span>
+            </div>
           </div>
-          <div className="profile-info ml-3">
-            <span className="profile-info-username">{user.name}</span>
-            <span className="profile-info-name" style={{ color: '#99b5d4' }}>
-              {user.fullname}
-            </span>
-          </div>
-        </div>
+        </Link>
         <div className="mt-4">
           <div className="d-flex flex-row justify-content-between">
             <small className="text-muted font-weight-normal">
@@ -62,28 +63,30 @@ export default class Suggestions extends Component {
           </div>
           <div>
             {users &&
-              users.map((user) => (
+              users.slice(0, 4).map((user) => (
                 <div
                   className="d-flex flex-row justify-content-between align-items-center mt-3 mb-3"
                   key={user._id}
                 >
-                  <div className="d-flex flex-row align-items-center">
-                    <div className="rounded-circle overflow-hidden d-flex justify-content-center align-items-center border sugest-profile-photo">
-                      <img
-                        src={this.getImg(user.photo)}
-                        alt="..."
-                        style={{
-                          transform: 'scale(1.5)',
-                          width: '100%',
-                          position: 'absolute',
-                          left: 0,
-                        }}
-                      />
+                  <Link to={`/profile/${user._id}`} className="link-menu">
+                    <div className="d-flex flex-row align-items-center">
+                      <div className="rounded-circle overflow-hidden d-flex justify-content-center align-items-center border sugest-profile-photo">
+                        <img
+                          src={this.getImg(user.photo)}
+                          alt="..."
+                          style={{
+                            transform: 'scale(1.5)',
+                            width: '100%',
+                            position: 'absolute',
+                            left: 0,
+                          }}
+                        />
+                      </div>
+                      <strong className="ml-3 sugest-username">
+                        {user.name}
+                      </strong>
                     </div>
-                    <strong className="ml-3 sugest-username">
-                      {user.name}
-                    </strong>
-                  </div>
+                  </Link>
                   {/* <button className="btn  btn-sm p-0 btn-ig ">
                     <span style={{ color: '#0095f6' }}>Follow</span>
                   </button> */}

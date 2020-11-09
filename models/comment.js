@@ -3,7 +3,7 @@ const { ObjectId } = mongoose.Schema.Types;
 const CommentSchema = new mongoose.Schema({
   user: {
     type: ObjectId,
-    ref: 'User',
+    ref: 'user',
     required: true,
   },
   post: {
