@@ -9,6 +9,7 @@ const User = require('../models/user');
 const multerStorage = multer.memoryStorage();
 const Comment = require('../models/comment');
 const { populate } = require('../models/user');
+const { fail } = require('assert');
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
     cb(null, true);
@@ -31,7 +32,7 @@ exports.postById = async (req, res, next, _id) => {
     next();
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: false,
       message: error,
     });
   }
@@ -49,7 +50,7 @@ exports.resizePostPhoto = async (req, res, next) => {
     next();
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: false,
       message: error,
     });
   }
@@ -62,12 +63,12 @@ exports.postByUser = async (req, res) => {
       .populate('postedBy', '_id name photo fullname')
       .sort('_created');
     res.status(200).json({
-      status: 'success',
-      post: post,
+      status: true,
+      data: post,
     });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: false,
       message: err,
     });
   }
@@ -115,14 +116,14 @@ exports.getPosts = async (req, res) => {
     res.status(200).json({ success: true, data: posts });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: false,
       message: error,
     });
   }
 };
 exports.getPost = (req, res) => {
   res.status(200).json({
-    status: 'success',
+    status: true,
     message: req.post,
   });
 };
@@ -139,14 +140,12 @@ exports.createPost = async (req, res) => {
       $inc: { postCount: 1 },
     });
     res.status(201).json({
-      status: 'success',
-      data: {
-        post: post,
-      },
+      status: true,
+      data: post,
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: false,
       message: err,
     });
   }
@@ -169,12 +168,12 @@ exports.deletePost = async (req, res) => {
     await req.post.remove();
 
     res.status(201).json({
-      status: 'success',
+      status: true,
       data: null,
     });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: false,
       message: error,
     });
   }
@@ -202,14 +201,12 @@ exports.updatePost = async (req, res) => {
 
     const post = await updatePost.save();
     res.status(200).json({
-      status: 'success',
-      data: {
-        post,
-      },
+      status: true,
+      data: post,
     });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: false,
       message: error,
     });
   }

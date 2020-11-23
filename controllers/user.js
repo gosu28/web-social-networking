@@ -28,7 +28,7 @@ exports.resizeUserPhoto = async (req, res, next) => {
     next();
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: false,
       message: error,
     });
   }
@@ -53,7 +53,7 @@ exports.userById = async (req, res, next, _id) => {
       .exec();
     if (!user) {
       res.status(400).json({
-        status: 'fail',
+        status: false,
         message: 'User not found',
       });
     }
@@ -61,7 +61,7 @@ exports.userById = async (req, res, next, _id) => {
     next();
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: false,
       message: error,
     });
   }
@@ -92,7 +92,7 @@ exports.getUserById = async (req, res) => {
 
   user.isMe = req.user.id === user._id.toString();
 
-  res.status(200).json({ success: true, user: user });
+  res.status(200).json({ success: true, data: user });
 };
 exports.allUsers = async (req, res) => {
   try {
@@ -109,15 +109,15 @@ exports.allUsers = async (req, res) => {
     res.status(200).json({ success: true, data: users });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
+      status: false,
       message: error,
     });
   }
 };
 exports.getUser = (req, res) => {
   res.status(200).json({
-    status: 'success',
-    user: req.user,
+    status: true,
+    data: req.user,
   });
 };
 exports.updateUser = async (req, res) => {
@@ -139,14 +139,12 @@ exports.updateUser = async (req, res) => {
       },
     );
     res.status(200).json({
-      status: 'success',
-      data: {
-        user: updateUser,
-      },
+      status: true,
+      data: updateUser,
     });
   } catch (error) {
     res.status(404).json({
-      status: 'fail',
+      status: false,
       message: err,
     });
   }
@@ -156,7 +154,7 @@ exports.follow = async (req, res) => {
   if (user._id == req.user._id) {
     return next(
       res.status(400).json({
-        status: 'fail',
+        status: false,
         message: "You can't unfollow/follow yourself",
       }),
     );
@@ -164,7 +162,7 @@ exports.follow = async (req, res) => {
   if (user.followers.includes(req.user._id)) {
     return next(
       res.status(400).json({
-        status: 'fail',
+        status: false,
         message: 'You are already following him',
       }),
     );
@@ -184,7 +182,7 @@ exports.unfollow = async (req, res) => {
   if (user._id === req.user._id) {
     return next(
       res.status(400).json({
-        status: 'fail',
+        status: false,
         message: "You can't follow/unfollow yourself",
       }),
     );
