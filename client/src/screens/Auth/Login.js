@@ -20,7 +20,7 @@ export default class Login extends Component {
     const user = { email, password };
     const response = await login(user);
 
-    if (response.status === 'success' && response.token) {
+    if (response.status && response.token) {
       localStorage.setItem('token', response.token);
       this.context.onLogin();
       // window.location.reload()

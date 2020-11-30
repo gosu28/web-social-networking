@@ -23,9 +23,10 @@ export default class DefaultHeader extends Component {
   }
   getUserData = async () => {
     let res = await this.UserApi.getUser();
-    if (res && res.status === 'success') {
+    console.log(res);
+    if (res && res.status) {
       this.setState({
-        userData: res.user,
+        userData: res.data,
       });
     }
   };

@@ -28,9 +28,9 @@ export default class Home extends Component {
   };
   getUserData = async () => {
     let res = await this.UserApi.getUser();
-    if (res && res.status === 'success') {
+    if (res && res.status) {
       this.setState({
-        userData: res.user,
+        userData: res.data,
       });
     }
   };

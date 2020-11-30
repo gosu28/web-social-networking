@@ -23,7 +23,7 @@ export default class Profile extends Component {
 
     if (res && res.success) {
       this.setState({
-        userData: res.user,
+        userData: res.data,
       });
     }
   };
