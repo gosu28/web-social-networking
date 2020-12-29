@@ -44,7 +44,7 @@ export default class Home extends Component {
             {data.length > 0 ? (
               <div className="row">
                 <div className="col-8">
-                  <CreatePost />
+                  <CreatePost getFeedData={this.getFeedData} />
                   {data.map((post) => (
                     <Post key={post._id} post={post} />
                   ))}

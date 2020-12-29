@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthContext } from 'context';
+import { AuthContext } from '../../context';
 import {
   InboxIcon,
   HomeIcon,

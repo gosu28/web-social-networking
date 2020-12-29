@@ -54,8 +54,9 @@ export default class CreatePost extends Component {
     const newPost = { content };
 
     const res = await this.PostApi.addNewPost(photo, newPost);
-    if (res.status === 'success') {
+    if (res.status) {
       this.handleReset();
+      this.props.getFeedData();
     }
   };
   render() {
